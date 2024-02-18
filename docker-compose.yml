@@ -8,6 +8,8 @@ services:
       dockerfile: 'Dockerfile'
     volumes:
       - ./available:/home/edge_booking/available
+    env_file:
+      - .env
     network_mode: host
     logging:
       options:

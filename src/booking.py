@@ -96,6 +96,7 @@ class Booking:
         action_chain.move_to_element(checkout_button).click().perform()
 
     def start(self):
+        print("starting booking...")
         self._browser.get(self._config.booking_url())
         self._click_cookie_button()
         self._login()
@@ -116,3 +117,4 @@ class Booking:
         # self._go_to_checkout()
 
         self._browser.quit()
+        print("booking ended")

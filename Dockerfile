@@ -1,4 +1,4 @@
-FROM 3.11-bookworm
+FROM python:3.11-bookworm
 
 LABEL maintainer="xLasercut"
 
@@ -6,7 +6,7 @@ ARG WRK_DIR=/home/edge_booking
 
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y curl bash bash-completion firefox && \
+    apt-get install -y curl bash bash-completion firefox-esr && \
     mkdir ${WRK_DIR}
 
 WORKDIR ${WRK_DIR}
@@ -20,6 +20,5 @@ RUN pipenv install --deploy --system
 
 COPY src/. ${WRK_DIR}/src/
 COPY main.py ${WRK_DIR}/main.py
-COPY config.ini ${WRK_DIR}/config.ini
 
 CMD ["python", "main.py"]
