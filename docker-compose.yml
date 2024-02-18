@@ -1,7 +1,7 @@
 version: '3'
 services:
-  amq_server:
-    container_name: edge_booking
+  edge_booking_main:
+    container_name: edge_booking_main
     restart: unless-stopped
     build:
       context: '.'
