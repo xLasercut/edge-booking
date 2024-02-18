@@ -1,0 +1,14 @@
+version: '3'
+services:
+  amq_server:
+    container_name: edge_booking
+    restart: unless-stopped
+    build:
+      context: '.'
+      dockerfile: 'Dockerfile'
+    volumes:
+      - ./available:/home/edge_booking/available
+    network_mode: host
+    logging:
+      options:
+        max-size: 50m
