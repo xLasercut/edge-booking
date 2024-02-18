@@ -19,7 +19,7 @@ def booking_job():
 
 
 if __name__ == '__main__':
-    schedule.every(30).minute.do(booking_job)
+    schedule.every(30).minutes.do(booking_job)
     while True:
         schedule.run_pending()
-        time.sleep(600)
+        time.sleep(1)

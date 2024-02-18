@@ -1,3 +1,4 @@
+import json
 import time
 from datetime import datetime, timedelta
 
@@ -7,7 +8,6 @@ from selenium.webdriver.common.by import By
 
 from src.config import BookingConfig
 from src.constants import AVAILABLE_DIR
-import json
 
 
 class Booking:
@@ -109,7 +109,8 @@ class Booking:
             badminton_times = self._fetch_all_badminton_times()
             output.append({
                 "booking_date": booking_date.strftime("%Y-%m-%d"),
-                "badminton_times": badminton_times
+                "badminton_times": badminton_times,
+                "delta": day_delta
             })
         with open(AVAILABLE_DIR / f"{current_date.isoformat()}.json", "w") as f:
             f.write(json.dumps(output, indent=2))
