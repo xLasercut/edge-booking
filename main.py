@@ -1,3 +1,6 @@
+import time
+
+import schedule
 from selenium.webdriver import Remote
 from selenium.webdriver.firefox.options import Options
 
@@ -16,8 +19,10 @@ def booking_job():
 
 
 if __name__ == '__main__':
-    booking_job()
-    # schedule.every(30).minutes.do(booking_job)
-    # while True:
-    #     schedule.run_pending()
-    #     time.sleep(1)
+    print("started booking jobs")
+    schedule.every().day.at("05:50").do(booking_job)
+    schedule.every().day.at("06:00").do(booking_job)
+    schedule.every().day.at("06:10").do(booking_job)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
