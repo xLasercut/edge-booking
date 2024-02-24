@@ -1,25 +1,32 @@
-import time
-
-import schedule
-from selenium.webdriver import Remote
-from selenium.webdriver.firefox.options import Options
+import logging
+from datetime import datetime
 
 from src.booking import Booking
 from src.config import BookingConfig
+from src.constants import LOG_DIR
+import time
+import schedule
 
 
 def booking_job():
+    logger_format = "%(asctime)s :: %(name)s :: %(levelname)s :: %(message)s"
+    formatter = logging.Formatter(logger_format)
+    logging.basicConfig(format=logger_format)
+    logger = logging.getLogger("selenium")
+    logger.setLevel(logging.INFO)
+    file_handler = logging.FileHandler(
+        filename=str(LOG_DIR / f"{datetime.now().isoformat()}.log")
+    )
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
     booking_config = BookingConfig()
-    driver_options = Options()
-    if booking_config.headless():
-        driver_options.add_argument('--headless')
-    browser = Remote(command_executor="http://localhost:4444", options=driver_options)
-    booking = Booking(browser, booking_config)
-    booking.start()
+    booking = Booking(logger, booking_config)
+    for account in booking_config.accounts():
+        booking.start(account)
 
 
-if __name__ == '__main__':
-    print("started booking jobs")
+if __name__ == "__main__":
+    # booking_job()
     schedule.every().day.at("05:50").do(booking_job)
     schedule.every().day.at("06:00").do(booking_job)
     schedule.every().day.at("06:10").do(booking_job)

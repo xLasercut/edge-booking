@@ -8,8 +8,8 @@ services:
       dockerfile: 'Dockerfile'
     volumes:
       - ./available:/home/edge_booking/available
-    env_file:
-      - .env
+      - ./log:/home/edge_booking/log
+      - ./config:/home/edge_booking/config
     network_mode: host
     depends_on:
       edge_booking_web_driver:

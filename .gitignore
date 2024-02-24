@@ -8,5 +8,7 @@ __pycache__
 
 *.env
 available/*
+log/*
+config/*
 
 !.gitkeep
