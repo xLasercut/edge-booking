@@ -9,13 +9,14 @@ import schedule
 
 
 def booking_job():
+    current_time = datetime.now()
     logger_format = "%(asctime)s :: %(name)s :: %(levelname)s :: %(message)s"
     formatter = logging.Formatter(logger_format)
     logging.basicConfig(format=logger_format)
-    logger = logging.getLogger("selenium")
+    logger = logging.getLogger(f"selenium - {current_time.isoformat()}")
     logger.setLevel(logging.INFO)
     file_handler = logging.FileHandler(
-        filename=str(LOG_DIR / f"{datetime.now().isoformat()}.log")
+        filename=str(LOG_DIR / f"{current_time.isoformat()}.log")
     )
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
