@@ -1,11 +1,13 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from src.constants import ISO_TIME_FORMAT, QUERY_TIME_FORMAT
 
 
 class BookingCardDetails(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
     activity: str
     location: str
     start_time: str
@@ -13,11 +15,15 @@ class BookingCardDetails(BaseModel):
 
 
 class UserCredentials(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
     jwt: str
     pid: str
 
 
 class ActivityDetails(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
     ActivityCode: str
     LocationCode: str
     LocationDescription: str
@@ -40,6 +46,8 @@ class ActivityDetails(BaseModel):
 
 
 class ActivitySubLocationDetails(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
     SubLocationGroupId: int
     SubLocationNames: str
     Available: bool

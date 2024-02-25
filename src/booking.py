@@ -11,6 +11,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from src.booking_driver_factory import BookingDriverFactory
 from src.config import GlobalBookingConfig, UserBookingConfig
+from src.constants import IS_PRODUCTION
 from src.exceptions import ApiError, ActivityNotFoundError
 from src.models import (
     UserCredentials,
@@ -128,6 +129,8 @@ class Booking:
             By.XPATH,
             f'//select[@id="oCard-sCardEndDateYear"]/option[text()="{self._user_config.card_expiry_year}"]',
         ).click()
+        if IS_PRODUCTION:
+            self._browser.find_element(By.ID, "form-submit").click()
 
     def _fetch_basket_id(self, access_token: str) -> str:
         self._logger.info("fetching basket id")
@@ -302,7 +305,7 @@ class Booking:
             self._go_to_checkout(basket_id)
             self._confirm_checkout()
             self._fill_payment_details()
-
+            time.sleep(20)
             self._browser.quit()
             self._logger.info("booking ended")
         except Exception as e:
