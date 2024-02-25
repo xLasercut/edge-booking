@@ -1,12 +1,46 @@
 from configparser import ConfigParser
 
-from src.constants import CONFIG_DIR, CONFIG_GLOBAL_SECTION
+from pydantic import BaseModel
+
+from src.constants import CONFIG_DIR, CONFIG_GLOBAL_SECTION, IS_PRODUCTION
 
 
-class BookingConfig:
+class GlobalBookingConfig(BaseModel):
+    headless_mode: bool
+    day_delta: int
+    retry_count: int
+
+
+class UserBookingConfig(BaseModel):
+    username: str
+    password: str
+    activity: str
+    start_time: str
+    address_line_1: str
+    address_city: str
+    address_postcode: str
+    payer_name: str
+    contact_number: str
+    card_type: str
+    card_number: str
+    card_cvv: str
+    card_expiry_month: str
+    card_expiry_year: str
+
+
+class BookingConfigFactory:
     def __init__(self):
         self._parser = ConfigParser()
-        self._parser.read(str(CONFIG_DIR / "config.ini"))
+        if IS_PRODUCTION:
+            self._parser.read("/run/secrets/booking_config")
+        else:
+            self._parser.read(str(CONFIG_DIR / "config.ini"))
+
+    def get_global_config(self) -> GlobalBookingConfig:
+        return GlobalBookingConfig(**self._parser[CONFIG_GLOBAL_SECTION])
+
+    def get_user_config(self, account: str) -> UserBookingConfig:
+        return UserBookingConfig(**self._parser[account])
 
     def accounts(self):
         return [
@@ -14,36 +48,3 @@ class BookingConfig:
             for section in self._parser.sections()
             if section != CONFIG_GLOBAL_SECTION
         ]
-
-    def username(self, account: str) -> str:
-        return self._parser[account]["username"]
-
-    def password(self, account: str) -> str:
-        return self._parser[account]["password"]
-
-    def headless(self) -> bool:
-        return self._parser[CONFIG_GLOBAL_SECTION]["headless_mode"].lower() == "true"
-
-    def local(self) -> bool:
-        return self._parser[CONFIG_GLOBAL_SECTION]["local_mode"].lower() == "true"
-
-    def start_time(self) -> str:
-        return self._parser[CONFIG_GLOBAL_SECTION]["start_time"]
-
-    def day_delta(self) -> int:
-        return int(self._parser[CONFIG_GLOBAL_SECTION]["day_delta"])
-
-    def address_line_1(self, account: str) -> str:
-        return self._parser[account]["address_line_1"]
-
-    def address_city(self, account: str) -> str:
-        return self._parser[account]["address_city"]
-
-    def address_postcode(self, account: str) -> str:
-        return self._parser[account]["address_postcode"]
-
-    def payer_name(self, account: str) -> str:
-        return self._parser[account]["payer_name"]
-
-    def contact_number(self, account: str) -> str:
-        return self._parser[account]["contact_number"]

@@ -1,11 +1,12 @@
 import logging
+import time
 from datetime import datetime
 
-from src.booking import Booking
-from src.config import BookingConfig
-from src.constants import LOG_DIR
-import time
 import schedule
+
+from src.booking import Booking
+from src.config import BookingConfigFactory
+from src.constants import LOG_DIR, IS_PRODUCTION
 
 
 def booking_job():
@@ -20,17 +21,22 @@ def booking_job():
     )
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
-    booking_config = BookingConfig()
-    booking = Booking(logger, booking_config)
-    for account in booking_config.accounts():
-        booking.start(account)
+    config_factory = BookingConfigFactory()
+    global_config = config_factory.get_global_config()
+
+    for account in config_factory.accounts():
+        user_config = config_factory.get_user_config(account)
+        booking = Booking(logger, global_config, user_config)
+        booking.start()
 
 
 if __name__ == "__main__":
-    # booking_job()
-    schedule.every().day.at("05:50").do(booking_job)
-    schedule.every().day.at("06:00").do(booking_job)
-    schedule.every().day.at("06:10").do(booking_job)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    if IS_PRODUCTION:
+        schedule.every().day.at("05:50").do(booking_job)
+        schedule.every().day.at("06:00").do(booking_job)
+        schedule.every().day.at("06:10").do(booking_job)
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+    else:
+        booking_job()
