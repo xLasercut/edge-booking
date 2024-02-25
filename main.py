@@ -32,9 +32,7 @@ def booking_job():
 
 if __name__ == "__main__":
     if IS_PRODUCTION:
-        schedule.every().day.at("05:50").do(booking_job)
         schedule.every().day.at("06:00").do(booking_job)
-        schedule.every().day.at("06:10").do(booking_job)
         while True:
             schedule.run_pending()
             time.sleep(1)
