@@ -11,7 +11,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from src.booking_driver_factory import BookingDriverFactory
 from src.config import GlobalBookingConfig, UserBookingConfig
-from src.constants import IS_PRODUCTION
+from src.constants import IS_PRODUCTION, SCREENSHOT_DIR
 from src.exceptions import ApiError, ActivityNotFoundError
 from src.models import (
     UserCredentials,
@@ -306,6 +306,7 @@ class Booking:
             self._confirm_checkout()
             self._fill_payment_details()
             time.sleep(20)
+            self._browser.get_screenshot_as_file(str(SCREENSHOT_DIR / f"{current_time.isoformat()}.png"))
             self._browser.quit()
             self._logger.info("booking ended")
         except Exception as e:

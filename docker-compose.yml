@@ -9,6 +9,7 @@ services:
     volumes:
       - ./available:/home/edge_booking/available
       - ./log:/home/edge_booking/log
+      - ./screenshots:/home/edge_booking/screenshots
     environment:
       ENVIRONMENT: prod
     network_mode: host
