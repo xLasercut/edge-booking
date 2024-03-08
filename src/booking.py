@@ -34,7 +34,7 @@ class Booking:
         self._user_config = user_config
 
     def _wait_element_exists(
-        self, locator: Tuple[str, str], duration: int = 10, driver=None
+        self, locator: Tuple[str, str], duration: int = 30, driver=None
     ):
         if driver is not None:
             return WebDriverWait(driver, duration).until(
@@ -283,6 +283,7 @@ class Booking:
         raise ApiError("could not add to basket")
 
     def _go_to_checkout(self, basket_id: str):
+        self._logger.info("going to checkout...")
         self._browser.get(
             f"https://sportsbookings.leeds.ac.uk/LhWeb/en/Members/Home/BasketDetails?basketId={basket_id}"
         )
