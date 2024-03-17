@@ -11,7 +11,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from src.booking_driver_factory import BookingDriverFactory
 from src.config import GlobalBookingConfig, UserBookingConfig
-from src.constants import IS_PRODUCTION, SCREENSHOT_DIR
+from src.constants import SCREENSHOT_DIR, USER_AGENT
 from src.exceptions import ApiError, ActivityNotFoundError
 from src.models import (
     UserCredentials,
@@ -32,6 +32,25 @@ class Booking:
         self._browser = driver_factory.get_driver()
         self._global_config = global_config
         self._user_config = user_config
+
+    @staticmethod
+    def _get_request_headers(
+        user_credentials: UserCredentials, basket_id: str = None
+    ) -> dict[str, str]:
+        cookie = "ApplicationGatewayAffinityCORS=6e35807dc672bfcf6ff57423ffbf7ebb; ApplicationGatewayAffinity=6e35807dc672bfcf6ff57423ffbf7ebb;"
+        if basket_id:
+            cookie += f" xn-basket-id={basket_id}"
+
+        return {
+            "User-Agent": USER_AGENT,
+            "Accept": "*/*",
+            "Authorization": f"Bearer {user_credentials.jwt}",
+            "Cookie": cookie,
+            "Host": "sportsbookings.leeds.ac.uk",
+            "Origin": "https://sportsbookings.leeds.ac.uk",
+            "Referer": "https://sportsbookings.leeds.ac.uk/LhWeb/en/Members/Bookings",
+            "Content-Type": "application/json"
+        }
 
     def _wait_element_exists(
         self, locator: Tuple[str, str], duration: int = 30, driver=None
@@ -129,16 +148,13 @@ class Booking:
             By.XPATH,
             f'//select[@id="oCard-sCardEndDateYear"]/option[text()="{self._user_config.card_expiry_year}"]',
         ).click()
-        if IS_PRODUCTION:
+        if not self._global_config.dry_run:
             self._browser.find_element(By.ID, "form-submit").click()
 
-    def _fetch_basket_id(self, access_token: str) -> str:
+    def _fetch_basket_id(self, user_credentials: UserCredentials) -> str:
         self._logger.info("fetching basket id")
         request_url = "https://sportsbookings.leeds.ac.uk/LhWeb/en/api/Basket"
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {access_token}",
-        }
+        headers = self._get_request_headers(user_credentials)
         response = requests.post(url=request_url, headers=headers)
         if response.status_code != 200:
             raise ApiError(f"could not create basket: {response.text}")
@@ -174,10 +190,7 @@ class Booking:
             "pid": user_credentials.pid,
             "date": f"{booking_time.strftime('%Y/%m/%d')} 00:00:00",
         }
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {user_credentials.jwt}",
-        }
+        headers = self._get_request_headers(user_credentials)
         response = requests.get(url=url, headers=headers, params=params)
         if response.status_code != 200:
             raise ApiError(f"could not fetch activities list: {response.text}")
@@ -208,10 +221,7 @@ class Booking:
             "startDateTime": activity.query_start_time(),
             "endDateTime": activity.query_end_time(),
         }
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {user_credentials.jwt}",
-        }
+        headers = self._get_request_headers(user_credentials)
         response = requests.get(url=url, headers=headers, params=params)
         if response.status_code != 200:
             raise ApiError(f"could not fetch activity sub locations: {response.text}")
@@ -226,14 +236,11 @@ class Booking:
     ) -> str:
         count = 0
         self._logger.info("adding activity to basket")
-        basket_id = self._fetch_basket_id(user_credentials.jwt)
+        basket_id = self._fetch_basket_id(user_credentials)
         url = (
             f"https://sportsbookings.leeds.ac.uk/LhWeb/en/api/Basket/{basket_id}/Items"
         )
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {user_credentials.jwt}",
-        }
+        headers = self._get_request_headers(user_credentials, basket_id)
         while count <= self._global_config.retry_count:
             for sub_location in sub_locations:
                 self._logger.info(sub_location)
@@ -308,7 +315,9 @@ class Booking:
             self._confirm_checkout()
             self._fill_payment_details()
             time.sleep(20)
-            self._browser.get_screenshot_as_file(str(SCREENSHOT_DIR / f"{current_time.isoformat()}.png"))
+            self._browser.get_screenshot_as_file(
+                str(SCREENSHOT_DIR / f"{current_time.isoformat()}.png")
+            )
             self._browser.quit()
             self._logger.info("booking ended")
         except Exception as e:

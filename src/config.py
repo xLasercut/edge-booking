@@ -1,14 +1,19 @@
 from configparser import ConfigParser
+from typing import Literal
 
 from pydantic import BaseModel
 
-from src.constants import CONFIG_DIR, CONFIG_GLOBAL_SECTION, IS_PRODUCTION
+from src.constants import CONFIG_DIR, CONFIG_GLOBAL_SECTION
+import os
 
 
 class GlobalBookingConfig(BaseModel):
     headless_mode: bool
     day_delta: int
     retry_count: int
+    driver: Literal["local", "remote", "docker"]
+    dry_run: bool
+    scheduled: bool
 
 
 class UserBookingConfig(BaseModel):
@@ -31,7 +36,7 @@ class UserBookingConfig(BaseModel):
 class BookingConfigFactory:
     def __init__(self):
         self._parser = ConfigParser()
-        if IS_PRODUCTION:
+        if os.path.isfile("/run/secrets/booking_config"):
             self._parser.read("/run/secrets/booking_config")
         else:
             self._parser.read(str(CONFIG_DIR / "config.ini"))

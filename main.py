@@ -6,10 +6,10 @@ import schedule
 
 from src.booking import Booking
 from src.config import BookingConfigFactory
-from src.constants import LOG_DIR, IS_PRODUCTION
+from src.constants import LOG_DIR
 
 
-def booking_job():
+def booking_job(config_factory: BookingConfigFactory) -> None:
     current_time = datetime.now()
     logger_format = "%(asctime)s :: %(name)s :: %(levelname)s :: %(message)s"
     formatter = logging.Formatter(logger_format)
@@ -21,7 +21,6 @@ def booking_job():
     )
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
-    config_factory = BookingConfigFactory()
     global_config = config_factory.get_global_config()
 
     for account in config_factory.accounts():
@@ -31,10 +30,13 @@ def booking_job():
 
 
 if __name__ == "__main__":
-    if IS_PRODUCTION:
-        schedule.every().day.at("06:00").do(booking_job)
+    booking_config_factory = BookingConfigFactory()
+    if booking_config_factory.get_global_config().scheduled:
+        schedule.every().day.at("06:00").do(
+            booking_job, config_factory=booking_config_factory
+        )
         while True:
             schedule.run_pending()
             time.sleep(1)
     else:
-        booking_job()
+        booking_job(booking_config_factory)

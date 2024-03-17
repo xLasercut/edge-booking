@@ -4,7 +4,7 @@ from selenium.webdriver import Remote, Firefox
 from selenium.webdriver.firefox.options import Options
 
 from src.config import GlobalBookingConfig
-from src.constants import IS_PRODUCTION
+from src.constants import Drivers
 
 
 class BookingDriverFactory:
@@ -20,9 +20,18 @@ class BookingDriverFactory:
             self._logger.info("Headless browser")
             driver_options.add_argument("--headless")
 
-        if not IS_PRODUCTION:
-            self._logger.info("Local mode")
+        if self._config.driver == Drivers.LOCAL:
             return Firefox(options=driver_options)
 
-        self._logger.info("Remote mode")
-        return Remote(command_executor="http://localhost:4444", options=driver_options)
+        if self._config.driver == Drivers.REMOTE:
+            return Remote(
+                command_executor="http://localhost:4444", options=driver_options
+            )
+
+        if self._config.driver == Drivers.DOCKER:
+            return Remote(
+                command_executor="http://edge_booking_web_driver:4444",
+                options=driver_options,
+            )
+
+        raise Exception("Unknown driver")
