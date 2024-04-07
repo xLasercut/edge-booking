@@ -8,6 +8,7 @@ selenium = "==4.17.2"
 schedule = "==1.2.1"
 requests = "==2.31.0"
 pydantic = "==2.6.2"
+pytz = "==2024.1"
 
 [dev-packages]
 black = "==24.2.0"

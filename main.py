@@ -32,9 +32,9 @@ def booking_job(config_factory: BookingConfigFactory) -> None:
 if __name__ == "__main__":
     booking_config_factory = BookingConfigFactory()
     if booking_config_factory.get_global_config().scheduled:
-        schedule.every().day.at("06:00").do(
-            booking_job, config_factory=booking_config_factory
-        )
+        schedule.every().day.at(
+            booking_config_factory.get_global_config().schedule_time, "Europe/London"
+        ).do(booking_job, config_factory=booking_config_factory)
         while True:
             schedule.run_pending()
             time.sleep(1)

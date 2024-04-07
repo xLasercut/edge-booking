@@ -14,6 +14,7 @@ class GlobalBookingConfig(BaseModel):
     driver: Literal["local", "remote", "docker"]
     dry_run: bool
     scheduled: bool
+    schedule_time: str
 
 
 class UserBookingConfig(BaseModel):
