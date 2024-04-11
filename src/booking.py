@@ -49,7 +49,7 @@ class Booking:
             "Host": "sportsbookings.leeds.ac.uk",
             "Origin": "https://sportsbookings.leeds.ac.uk",
             "Referer": "https://sportsbookings.leeds.ac.uk/LhWeb/en/Members/Bookings",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         }
 
     def _wait_element_exists(
@@ -200,6 +200,7 @@ class Booking:
             self._logger.info(activity)
             if (
                 activity.ActivityDescription == self._user_config.activity
+                and self._user_config.location in activity.LocationDescription
                 and self._user_config.start_time in activity.StartTime
             ):
                 self._logger.info("found matching activity")

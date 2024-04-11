@@ -32,15 +32,13 @@ class UserBookingConfig(BaseModel):
     card_cvv: str
     card_expiry_month: str
     card_expiry_year: str
+    location: str
 
 
-class BookingConfigFactory:
+class BookingConfig:
     def __init__(self):
         self._parser = ConfigParser()
-        if os.path.isfile("/run/secrets/booking_config"):
-            self._parser.read("/run/secrets/booking_config")
-        else:
-            self._parser.read(str(CONFIG_DIR / "config.ini"))
+        self._parser.read(str(CONFIG_DIR / "config.ini"))
 
     def get_global_config(self) -> GlobalBookingConfig:
         return GlobalBookingConfig(**self._parser[CONFIG_GLOBAL_SECTION])
