@@ -1,4 +1,3 @@
-version: '3'
 services:
   edge_booking_main:
     container_name: edge_booking_main
@@ -13,8 +12,6 @@ services:
     depends_on:
       edge_booking_web_driver:
         condition: service_started
-    secrets:
-      - booking_config
     logging:
       options:
         max-size: 50m
@@ -28,7 +25,3 @@ services:
     logging:
       options:
         max-size: 50m
-
-secrets:
-  booking_config:
-    file: config/config.ini
