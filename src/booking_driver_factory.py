@@ -1,3 +1,4 @@
+import os
 from logging import Logger
 
 from selenium.webdriver import Remote, Firefox
@@ -25,12 +26,17 @@ class BookingDriverFactory:
 
         if self._config.driver == Drivers.REMOTE:
             return Remote(
-                command_executor="http://localhost:4444", options=driver_options
+                command_executor=os.environ.get(
+                    "REMOTE_DRIVER_URL", "http://localhost:4444"
+                ),
+                options=driver_options,
             )
 
         if self._config.driver == Drivers.DOCKER:
             return Remote(
-                command_executor="http://edge_booking_web_driver:4444",
+                command_executor=os.environ.get(
+                    "DOCKER_DRIVER_URL", "http://edge_booking_web_driver:4444"
+                ),
                 options=driver_options,
             )
 
