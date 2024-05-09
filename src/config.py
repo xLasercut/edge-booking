@@ -4,17 +4,17 @@ from typing import Literal
 from pydantic import BaseModel
 
 from src.constants import CONFIG_DIR, CONFIG_GLOBAL_SECTION
-import os
 
 
 class GlobalBookingConfig(BaseModel):
     headless_mode: bool
     day_delta: int
     retry_count: int
-    driver: Literal["local", "remote", "docker"]
+    driver: Literal["local", "remote"]
     dry_run: bool
     scheduled: bool
     schedule_time: str
+    driver_url: str = "http://localhost:4444"
 
 
 class UserBookingConfig(BaseModel):

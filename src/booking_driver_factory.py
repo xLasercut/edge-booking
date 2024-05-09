@@ -26,17 +26,7 @@ class BookingDriverFactory:
 
         if self._config.driver == Drivers.REMOTE:
             return Remote(
-                command_executor=os.environ.get(
-                    "REMOTE_DRIVER_URL", "http://localhost:4444"
-                ),
-                options=driver_options,
-            )
-
-        if self._config.driver == Drivers.DOCKER:
-            return Remote(
-                command_executor=os.environ.get(
-                    "DOCKER_DRIVER_URL", "http://edge_booking_web_driver:4444"
-                ),
+                command_executor=self._config.driver_url,
                 options=driver_options,
             )
 
