@@ -148,6 +148,9 @@ class Booking:
             By.XPATH,
             f'//select[@id="oCard-sCardEndDateYear"]/option[text()="{self._user_config.card_expiry_year}"]',
         ).click()
+        self._browser.find_element(By.ID, "form-submit").click()
+
+    def _confirm_payment(self):
         if not self._global_config.dry_run:
             self._browser.find_element(By.ID, "form-submit").click()
 
@@ -315,6 +318,7 @@ class Booking:
             self._go_to_checkout(basket_id)
             self._confirm_checkout()
             self._fill_payment_details()
+            self._confirm_payment()
             time.sleep(20)
             self._browser.get_screenshot_as_file(
                 str(SCREENSHOT_DIR / f"{current_time.isoformat()}.png")
