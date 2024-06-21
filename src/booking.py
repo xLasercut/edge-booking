@@ -301,7 +301,9 @@ class Booking:
 
     def _close_alerts(self):
         try:
-            alert = self._wait_element_exists((By.XPATH, '//div[@class="xn-alerts"]'))
+            alert = self._wait_element_exists(
+                (By.XPATH, '//div[@class="xn-alerts"]'), duration=5
+            )
             self._browser.execute_script("arguments[0].style.display = 'none';", alert)
             self._browser.implicitly_wait(1)
             return
