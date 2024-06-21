@@ -299,6 +299,16 @@ class Booking:
             f"https://sportsbookings.leeds.ac.uk/LhWeb/en/Members/Home/BasketDetails?basketId={basket_id}"
         )
 
+    def _close_alerts(self):
+        try:
+            alert = self._wait_element_exists((By.XPATH, '//div[@class="xn-alerts"]'))
+            self._browser.execute_script("arguments[0].style.display = 'none';", alert)
+            self._browser.implicitly_wait(1)
+            return
+        except Exception as e:
+            self._logger.exception(e)
+            return
+
     def start(self):
         try:
             self._logger.info("starting booking...")
@@ -316,6 +326,7 @@ class Booking:
             )
             basket_id = self._add_to_basket(activity, sub_locations, user_credentials)
             self._go_to_checkout(basket_id)
+            self._close_alerts()
             self._confirm_checkout()
             self._fill_payment_details()
             self._confirm_payment()
