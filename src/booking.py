@@ -168,12 +168,12 @@ class Booking:
     def _fetch_user_credentials(self) -> UserCredentials:
         count = 0
         session_storage = self._browser.execute_script(
-            'return window.localStorage.getItem("oidc.user:https://sportsbookings.leeds.ac.uk/lhweb/identity:LhWebJs")'
+            'return window.sessionStorage.getItem("oidc.user:https://sportsbookings.leeds.ac.uk/lhweb/identity:LhWebJs")'
         )
         while not session_storage and count <= 20:
             self._logger.info(f"fetching session storage: {session_storage}")
             session_storage = self._browser.execute_script(
-                'return window.localStorage.getItem("oidc.user:https://sportsbookings.leeds.ac.uk/lhweb/identity:LhWebJs")'
+                'return window.sessionStorage.getItem("oidc.user:https://sportsbookings.leeds.ac.uk/lhweb/identity:LhWebJs")'
             )
             count += 1
             time.sleep(1)
